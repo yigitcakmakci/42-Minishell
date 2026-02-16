@@ -1,6 +1,8 @@
 #ifndef MINISHELL_H
 #define MINISHELL_H
 
+#include <stddef.h>
+
 typedef enum e_token_tpye
 {
     WORD,
@@ -13,12 +15,15 @@ typedef enum e_token_tpye
 
 typedef struct s_token
 {
-    char            value;
+    char            *value;
     t_token_type    type;
     struct s_token  *next;
 }   t_token;
 
+//LEXICAL.C
 void    lexical();
 
+//LIST_MANAGEMENT
+int     add_word_to_list(t_token **tokens, char *str, t_token_type type);
 
 #endif
