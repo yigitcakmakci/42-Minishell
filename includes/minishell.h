@@ -21,7 +21,7 @@ typedef struct s_token
 }   t_token;
 
 //LEXICAL.C
-void    lexical();
+t_token  *lexical();
 
 //LIST_MANAGEMENT
 int     add_word_to_list(t_token **tokens, char *str, t_token_type type);

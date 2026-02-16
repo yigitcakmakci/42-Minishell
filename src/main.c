@@ -6,6 +6,7 @@
 
 int main(void)
 {
+	t_token	*tokens;
 	char	*input;
 	while (1)
 	{
@@ -15,7 +16,7 @@ int main(void)
 		if (*input)
 		{
 			add_history(input);
-			lexical(input);
+			tokens = lexical(input);
 			printf("girilen komut : %s\n", input);
 		}
 		free(input);

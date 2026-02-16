@@ -2,7 +2,87 @@
 #include <stdlib.h>
 #include "../includes/minishell.h"
 
-void    lexical(char *input)
+int handle_pipe(t_token *tokens)
+{
+    t_token *temp_token = tokens;
+    if (temp_token -> type == PIPE)
+    {
+        printf("syntax error near unexpected token '%s'", temp_token->value);
+        return (0);
+    }
+    while (temp_token -> next != NULL)
+    {
+        if (temp_token ->type == PIPE && temp_token -> next -> type == PIPE)
+        {
+            printf("syntax error near unexpected token '%s'", temp_token->next->value);
+            return (0);
+        }
+        temp_token = temp_token->next;
+    }
+    if (temp_token -> type == PIPE)
+    {
+        printf("syntax error near unexpected token '%s'", temp_token->value);
+        return(0);
+    }
+    return(1);
+}
+
+int handle_redirection(t_token *tokens)
+{
+    t_token *temp_token = tokens;
+    while (temp_token -> next != NULL)
+    {
+        if ((temp_token -> type == RED_IN || temp_token -> type == RED_OUT || temp_token -> type == APPEND || temp_token -> type == HEREDOC) && (temp_token -> next -> type != WORD))
+        {
+            printf("syntax error near unexpected token '%s'", temp_token->next->value);
+            return (0);
+        }
+        temp_token = temp_token -> next;
+    }
+    if (temp_token -> type == RED_IN || temp_token -> type == RED_OUT || temp_token -> type == APPEND || temp_token -> type == HEREDOC)
+    {
+        printf("syntax error near unexpected token '%s'", temp_token->value);
+        return(0);
+    }
+    return(1);
+}
+
+static  int handle_quotes(char *str)
+{
+    int i = 0;
+    int temp_quote_index;
+    while (str[i])
+    {
+        if (str[i] == 34 || str[i] == 39)
+        {
+            temp_quote_index = i;
+            i++;
+            while (str[temp_quote_index] != str[i] && str[i])
+                i++;
+            if (!str[i])
+            {
+                printf("-------QUOTES ERROR!-------");
+                return(0);
+            }
+        }
+        i++;
+    }
+    return(1);
+}
+
+static int handle_list(t_token  *tokens, char *input)
+{
+    if (!handle_pipe(tokens))
+        return(0);
+    if (!handle_redirection(tokens))
+        return(0);
+    if (!handle_quotes(input))
+        return(0);
+    
+    return(1);
+}
+
+t_token *lexical(char *input)
 {
     t_token *tokens = NULL;
     int i = 0;
@@ -11,20 +91,25 @@ void    lexical(char *input)
         while (input[i] == ' ')
             i++;
         if ((input[i] <= 'z' && input[i] >= 'a') || (input[i] <= 'Z' && input[i] >= 'A') || (input[i] <= '9' && input[i] >= '0') || (input[i] == 34 || input[i] == 39))
-        {
             i+=add_word_to_list(&tokens, &input[i], WORD);
-        }
-        if (input[i] == '<')
+        if (input[i] == '<' && input[i + 1] == '<')
+            i+=add_word_to_list(&tokens, &input[i], HEREDOC);
+        else if (input[i] == '<')
             add_word_to_list(&tokens, &input[i], RED_IN);
+        else if (input[i] == '>' && input[i + 1] == '>')
+            i+=add_word_to_list(&tokens, &input[i], APPEND);
         else if (input[i] == '>')
             add_word_to_list(&tokens, &input[i], RED_OUT);
         else if (input[i] == '|')
             add_word_to_list(&tokens, &input[i], PIPE);
         i++;
     }
+    if(!handle_list(tokens, input))
+        printf("\n<<<<<<<GEÇERSİZ ARGÜMAN>>>>>>>>\n");
     while (tokens != NULL)
     {
-        printf("KELİME: %s\nTYPE: %d\n", tokens->value, tokens->type);
-        tokens = tokens->next;
+        printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n", tokens-> value, tokens->type );
+        tokens = tokens -> next;
     }
+    return (tokens);
 }
