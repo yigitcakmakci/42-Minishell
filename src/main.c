@@ -2,9 +2,11 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <stdlib.h>
+#include "../includes/minishell.h"
 
 int main(void)
 {
+	t_token	*tokens;
 	char	*input;
 	while (1)
 	{
@@ -14,10 +16,12 @@ int main(void)
 		if (*input)
 		{
 			add_history(input);
-
+			tokens = lexical(input);
 			printf("girilen komut : %s\n", input);
 		}
 		free(input);
 	}
 	return (0);
 }
+
+
