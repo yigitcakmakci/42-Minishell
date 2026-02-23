@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../libft/libft.h"
 
-void    add_list_str(t_token **tokens, char *content, t_token_type type)
+static void    add_list_str(t_token **tokens, char *content, t_token_type type)
 {
     t_token *new_node;
     t_token *temp_token;
@@ -36,7 +36,7 @@ int add_word_to_list(t_token **tokens, char *str, t_token_type type)
         }
         else
         {
-            while ((str[len] <= 'z' && str[len] >= 'a') || (str[len] <= 'Z' && str[len] >= 'A') || (str[len] <= '9' && str[len] >= '0'))
+            while (is_word(str[len]))
                 len++;
             add_list_str(tokens, ft_substr(str, 0, len), type);
         }

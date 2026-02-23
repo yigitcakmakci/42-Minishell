@@ -1,6 +1,6 @@
 NAME = minishell
 
-SRC = src/main.c src/lexical.c src/list_management.c libft/ft_substr.c
+SRC = src/main.c src/lexical.c src/list_management.c libft/ft_substr.c src/parser_expander.c libft/ft_strjoin.c libft/ft_strncmp.c src/utils.c
 
 OBJ = $(SRC:.c=.o)
 

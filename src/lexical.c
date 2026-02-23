@@ -85,12 +85,17 @@ static int handle_list(t_token  *tokens, char *input)
 t_token *lexical(char *input)
 {
     t_token *tokens = NULL;
+    t_token *temp_token;
     int i = 0;
     while (input[i])
     {
         while (input[i] == ' ')
             i++;
-        if ((input[i] <= 'z' && input[i] >= 'a') || (input[i] <= 'Z' && input[i] >= 'A') || (input[i] <= '9' && input[i] >= '0') || (input[i] == 34 || input[i] == 39))
+        if (input[i] == 34)
+            i+=add_word_to_list(&tokens, &input[i], DOUBLE_QUOTES);
+        if (input [i] == 39)
+            i+=add_word_to_list(&tokens, &input[i], SINGLE_QUOTES);
+        if (is_word(input[i]))
             i+=add_word_to_list(&tokens, &input[i], WORD);
         if (input[i] == '<' && input[i + 1] == '<')
             i+=add_word_to_list(&tokens, &input[i], HEREDOC);
@@ -106,10 +111,12 @@ t_token *lexical(char *input)
     }
     if(!handle_list(tokens, input))
         printf("\n<<<<<<<GEÇERSİZ ARGÜMAN>>>>>>>>\n");
-    while (tokens != NULL)
+    temp_token = tokens;
+    while (temp_token != NULL)
     {
-        printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n", tokens-> value, tokens->type );
-        tokens = tokens -> next;
+        printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n", temp_token-> value, temp_token->type );
+        temp_token = temp_token -> next;
     }
     return (tokens);
+    printf("---------LEXICAL OUTSIDE-----------\n");
 }

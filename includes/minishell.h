@@ -3,9 +3,11 @@
 
 #include <stddef.h>
 
-typedef enum e_token_tpye
+typedef enum e_token_type
 {
     WORD,
+    SINGLE_QUOTES,
+    DOUBLE_QUOTES,
     PIPE,
     RED_IN,
     RED_OUT,
@@ -21,9 +23,15 @@ typedef struct s_token
 }   t_token;
 
 //LEXICAL.C
-t_token  *lexical();
+t_token  *lexical(char *input);
 
-//LIST_MANAGEMENT
+//PARSER&EXPANDER.C
+void    expander(t_token *tokens, char **envp);
+
+//LIST_MANAGEMENT.C
 int     add_word_to_list(t_token **tokens, char *str, t_token_type type);
+
+//ITİLS.C
+int is_word(char c);
 
 #endif

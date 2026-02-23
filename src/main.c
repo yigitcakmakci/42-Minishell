@@ -4,8 +4,13 @@
 #include <stdlib.h>
 #include "../includes/minishell.h"
 
-int main(void)
+int main(int argc, char **argv, char **envp)
 {
+	if (argc == 92989234)
+	{
+		printf("%s", argv[1]);
+	}
+	
 	t_token	*tokens;
 	char	*input;
 	while (1)
@@ -17,6 +22,12 @@ int main(void)
 		{
 			add_history(input);
 			tokens = lexical(input);
+			expander(tokens, envp);
+			while (tokens != NULL)
+			{
+				printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n", tokens-> value, tokens->type );
+				tokens = tokens -> next;
+			}
 			printf("girilen komut : %s\n", input);
 		}
 		free(input);
