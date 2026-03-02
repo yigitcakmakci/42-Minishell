@@ -85,38 +85,36 @@ static int handle_list(t_token  *tokens, char *input)
 t_token *lexical(char *input)
 {
     t_token *tokens = NULL;
-    t_token *temp_token;
     int i = 0;
+    
     while (input[i])
     {
         while (input[i] == ' ')
             i++;
+        if (!input[i]) // Sona ulaştıysak döngüyü kır
+            break ;
+
         if (input[i] == 34)
-            i+=add_word_to_list(&tokens, &input[i], DOUBLE_QUOTES);
-        if (input [i] == 39)
-            i+=add_word_to_list(&tokens, &input[i], SINGLE_QUOTES);
-        if (is_word(input[i]))
-            i+=add_word_to_list(&tokens, &input[i], WORD);
-        if (input[i] == '<' && input[i + 1] == '<')
-            i+=add_word_to_list(&tokens, &input[i], HEREDOC);
+            i += add_word_to_list(&tokens, &input[i], DOUBLE_QUOTES);
+        else if (input[i] == 39)
+            i += add_word_to_list(&tokens, &input[i], SINGLE_QUOTES);
+        else if (is_word(input[i]))
+            i += add_word_to_list(&tokens, &input[i], WORD);
+        else if (input[i] == '<' && input[i + 1] == '<')
+            i += add_word_to_list(&tokens, &input[i], HEREDOC);
         else if (input[i] == '<')
-            add_word_to_list(&tokens, &input[i], RED_IN);
+            i += add_word_to_list(&tokens, &input[i], RED_IN);
         else if (input[i] == '>' && input[i + 1] == '>')
-            i+=add_word_to_list(&tokens, &input[i], APPEND);
+            i += add_word_to_list(&tokens, &input[i], APPEND);
         else if (input[i] == '>')
-            add_word_to_list(&tokens, &input[i], RED_OUT);
+            i += add_word_to_list(&tokens, &input[i], RED_OUT);
         else if (input[i] == '|')
-            add_word_to_list(&tokens, &input[i], PIPE);
-        i++;
+            i += add_word_to_list(&tokens, &input[i], PIPE);
+        else
+            i++; // Hiçbirine uymazsa (örneğin tanımsız bir sembol), sonsuz döngü olmasın diye atla
     }
+    
     if(!handle_list(tokens, input))
         printf("\n<<<<<<<GEÇERSİZ ARGÜMAN>>>>>>>>\n");
-    temp_token = tokens;
-    while (temp_token != NULL)
-    {
-        printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n", temp_token-> value, temp_token->type );
-        temp_token = temp_token -> next;
-    }
     return (tokens);
-    printf("---------LEXICAL OUTSIDE-----------\n");
 }

@@ -25,29 +25,36 @@ static void    add_list_str(t_token **tokens, char *content, t_token_type type)
 int add_word_to_list(t_token **tokens, char *str, t_token_type type)
 {
     int     len = 0;
-    if (type == WORD)
+    char    *token;
+
+    if (type == SINGLE_QUOTES || type == DOUBLE_QUOTES)
     {
-        if (*str == 34 || *str == 39)
-        {
+        len++;
+        while (str[len] && str[len] != str[0])
             len++;
-            while (str[0] != str[len] && str[len])
-                len++;
-            add_list_str(tokens, ft_substr(str, 1, len-1), type);
-        }
-        else
-        {
-            while (is_word(str[len]))
-                len++;
-            add_list_str(tokens, ft_substr(str, 0, len), type);
-        }
+        if (str[len] == str[0])
+            len++;
+        token = ft_substr(str, 0, len);
+        add_list_str(tokens, token, type);
+    }
+    else if(type == WORD)
+    {
+        while (str[len] && is_word(str[len]))
+            len++;
+        token = ft_substr(str, 0, len);
+        add_list_str(tokens, token, type);
     }
     else if (type == HEREDOC || type == APPEND)
     {
-        len = 1;
-        add_list_str(tokens, ft_substr(str, 0, 2), type);
+        len = 2;
+        token = ft_substr(str, 0, len);
+        add_list_str(tokens, token, type);
     }
-    
     else
-        add_list_str(tokens, ft_substr(str, 0, 1), type);
+    {
+        len = 1;
+        token =  ft_substr(str, 0, len);
+        add_list_str(tokens, token, type);
+    }
     return (len);
 }

@@ -4,11 +4,18 @@
 #include <stdlib.h>
 #include "../includes/minishell.h"
 
+int g_exit_status = 0;
+
 int main(int argc, char **argv, char **envp)
 {
+	g_exit_status = 0;
 	if (argc == 92989234)
 	{
 		printf("%s", argv[1]);
+	}
+	if (g_exit_status == 0)
+	{
+		printf("%d", g_exit_status);
 	}
 	
 	t_token	*tokens;
@@ -25,7 +32,7 @@ int main(int argc, char **argv, char **envp)
 			expander(tokens, envp);
 			while (tokens != NULL)
 			{
-				printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n", tokens-> value, tokens->type );
+				printf("-------TOKENS-----\nVERİ: %s\nTÜR: %d\n+++++++TOKENS++++++\n", tokens-> value, tokens->type );
 				tokens = tokens -> next;
 			}
 			printf("girilen komut : %s\n", input);

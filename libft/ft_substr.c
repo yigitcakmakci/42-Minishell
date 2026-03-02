@@ -6,24 +6,12 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 22:46:18 by ycakmakc          #+#    #+#             */
-/*   Updated: 2025/06/27 15:15:57 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/03/02 20:45:47 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include <stdlib.h>
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	str_len;
-
-	str_len = 0;
-	while (s[str_len])
-	{
-		str_len++;
-	}
-	return (str_len);
-}
 
 char	*ft_strdup(const char *s)
 {

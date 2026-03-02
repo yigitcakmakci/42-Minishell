@@ -2,7 +2,7 @@
 #define MINISHELL_H
 
 #include <stddef.h>
-
+extern int g_exit_status;
 typedef enum e_token_type
 {
     WORD,
@@ -33,5 +33,6 @@ int     add_word_to_list(t_token **tokens, char *str, t_token_type type);
 
 //ITİLS.C
 int is_word(char c);
+int is_space(char c);
 
 #endif
