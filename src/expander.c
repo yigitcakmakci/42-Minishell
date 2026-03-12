@@ -72,7 +72,6 @@ static int  count_quotes(char *t_token_value)
     return  (quotes_count);
 }
 
-//LOOK HERE
 static void remove_quotes(t_token *tokens)
 {
     t_token *temp_token = tokens;
@@ -104,7 +103,10 @@ static void remove_quotes(t_token *tokens)
                     i++;
             }
         }
-        new_token_value[j] = '\0';
+        if (new_token_value)
+            new_token_value[j] = '\0';
+        else
+            new_token_value = ft_strdup("");
         free(temp_token->value);
         temp_token -> value = new_token_value;
         temp_token = temp_token->next;

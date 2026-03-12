@@ -91,7 +91,7 @@ t_token *lexical(char *input)
     {
         while (input[i] == ' ')
             i++;
-        if (!input[i]) // Sona ulaştıysak döngüyü kır
+        if (!input[i])
             break ;
 
         if (input[i] == 34)
@@ -111,7 +111,7 @@ t_token *lexical(char *input)
         else if (input[i] == '|')
             i += add_word_to_list(&tokens, &input[i], PIPE);
         else
-            i++; // Hiçbirine uymazsa (örneğin tanımsız bir sembol), sonsuz döngü olmasın diye atla
+            i++;
     }
     
     if(!handle_list(tokens, input))
