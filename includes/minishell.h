@@ -15,6 +15,16 @@ typedef enum e_token_type
     HEREDOC,
 }   t_token_type;
 
+typedef struct s_cmd
+{
+    char            **args;
+    char            *path;
+    int             infd;
+    int             outfd;
+    struct s_cmd    *next;
+    
+}   t_cmd;
+
 typedef struct s_token
 {
     char            *value;
@@ -30,13 +40,13 @@ t_token  *lexical(char *input);
 void    expander(t_token *tokens, char **envp);
 
 //PARSER.C
-void    parser(t_token *tokens, char **envp);
+t_cmd    *parser(t_token *tokens, char **envp);
 
 //LIST_MANAGEMENT.C
 int         add_word_to_list(t_token **tokens, char *str, t_token_type type);
 void        join_list(t_token **dest_token);
 
-//ITİLS.C
+//UTİLS.C
 int is_word(char c);
 int is_space(char c);
 int is_operators(char c);

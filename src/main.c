@@ -18,6 +18,7 @@ int main(int argc, char **argv, char **envp)
 		printf("%d", g_exit_status);
 	}
 	t_token	*tokens;
+	t_cmd	*cmds;
 	char	*input;
 	while (1)
 	{
@@ -27,19 +28,26 @@ int main(int argc, char **argv, char **envp)
 		if (*input)
 		{
 			add_history(input);
-			printf("TEST96\n");
 			tokens = lexical(input);
-			printf("TEST97\n");
 			expander(tokens, envp);
-			printf("TEST98\n");
-			parser(tokens, envp);
-			printf("TEST99\n");
+			cmds = parser(tokens, envp);
 			while (tokens != NULL)
 			{
-				printf("-------TOKENS-----\nVERİ: _%s_\nTÜR: _%d_\nRIF: _%d_\n+++++++TOKENS++++++\n", tokens-> value, tokens->type, tokens->rif );
+				printf("-------TOKENS-----\nVERİ: _%s_\nTÜR: _%d_\nRIF: _%d_\n+++++++TOKENS++++++\n", tokens-> value, tokens->type, tokens->rif);
 				tokens = tokens -> next;
 			}
-			printf("girilen komut : %s\n", input);
+			while (cmds != NULL)
+			{
+				int i = 0;
+				printf("-------CMDS-----\nINFD: _%d_\nOUTFD: _%d_\n", cmds -> infd, cmds->outfd);
+				while (cmds->args[i])
+				{
+					printf("ARGS[%d] = _%s_\n", i, cmds->args[i]);
+					i++;
+				}
+				printf("+++++++CMDS++++++\n");
+				cmds = cmds -> next;
+			}
 		}
 		free(input);
 	}
