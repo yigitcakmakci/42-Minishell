@@ -2,7 +2,7 @@ NAME = minishell
 
 SRC = src/main.c src/lexical.c src/list_management.c libft/ft_substr.c src/expander.c src/parser.c \
 	libft/ft_strjoin.c libft/ft_strncmp.c src/utils.c libft/ft_itoa.c libft/ft_isalnum.c libft/ft_strlen.c \
-	libft/ft_strdup.c
+	libft/ft_strdup.c src/parser_utils.c src/expander_utils.c src/lexical_utils.c
 
 OBJ = $(SRC:.c=.o)
 

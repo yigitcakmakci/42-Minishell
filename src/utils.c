@@ -1,19 +1,30 @@
-int is_word(char c)
-{
-    return(c != '\0' && c != ' ' && c != '"' && c != '\'' && c != '<' && c != '>' && c != '|' && c != '\t' && c != '\n' && c != '\v' && c != '\f' && c != '\r');
-}
+#include "../includes/minishell.h"
 
 int is_space(char c)
 {
-    return(c == '\0' || c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r');
+    if (c == '\0' || c == ' ' || c == '\t' || c == '\n'
+        || c == '\v' || c == '\f' || c == '\r')
+        return (1);
+    return (0);
 }
 
 int is_operators(char c)
 {
-    return(c == '<' || c == '>' || c == '|');
+    if (c == '<' || c == '>' || c == '|')
+        return (1);
+    return (0);
 }
 
-int is_qutotes(char c)
+int is_quotes(char c)
 {
-    return(c == 34 || c == 39);
+    if (c == 34 || c == 39)
+        return (1);
+    return (0);
+}
+
+int is_word(char c)
+{
+    if (!is_space(c) && !is_operators(c) && !is_quotes(c))
+        return (1);
+    return (0);
 }
