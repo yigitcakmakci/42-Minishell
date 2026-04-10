@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:10 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 15:59:22 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/10 09:58:39 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,9 @@ int	count_cmds(t_token *tokens)
 	temp = tokens;
 	while (temp && temp->type != PIPE)
 	{
+		if (is_word_token(temp->type))
+			i++;
 		temp = temp->next;
-		i++;
 	}
 	return (i);
 }

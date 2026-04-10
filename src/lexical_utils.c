@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:56 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 15:47:30 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/10 09:58:39 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	handle_redirection(t_token *tokens)
 		return (1);
 	while (tmp->next)
 	{
-		if (is_redir(tmp->type) && tmp->next->type != WORD)
+		if (is_redir(tmp->type) && !is_word_token(tmp->next->type))
 			return (print_syntax_error(tmp->next->value));
 		tmp = tmp->next;
 	}

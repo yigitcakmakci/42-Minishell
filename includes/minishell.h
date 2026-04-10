@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:50:31 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 16:16:17 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/10 10:20:58 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ t_token				*lexical(char *input);
 char				*get_env_val(char *var_name, char **envp);
 char				*sandwich(char *str, int ch_addr, char **envp);
 int					count_quotes(char *str);
+void				expand_exit_status(t_token *tmp, int i);
 
 // EXPANDER.C
 void				expander(t_token *tokens, char **envp);
@@ -86,5 +87,6 @@ void				join_list(t_token **dest_token);
 int					is_word(char c);
 int					is_space(char c);
 int					is_operators(char c);
+int					is_quotes(char c);
 
 #endif

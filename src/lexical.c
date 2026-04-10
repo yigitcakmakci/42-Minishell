@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:58 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 15:47:46 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/10 09:58:39 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,9 @@ t_token	*lexical(char *input)
 		i += process_token(&tokens, input, i);
 	}
 	if (!handle_list(tokens, input))
+	{
 		printf("\n<<<<<<<GEÇERSİZ ARGÜMAN>>>>>>>>\n");
+		return (NULL);
+	}
 	return (tokens);
 }

@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:49 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 15:46:41 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/10 10:20:58 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,4 +78,24 @@ int	count_quotes(char *str)
 		i++;
 	}
 	return (count);
+}
+
+void	expand_exit_status(t_token *tmp, int i)
+{
+	char	*exit_str;
+	char	*prefix;
+	char	*suffix;
+	char	*new_val;
+
+	exit_str = ft_itoa(g_exit_status);
+	prefix = ft_substr(tmp->value, 0, i);
+	suffix = ft_strdup(tmp->value + i + 2);
+	new_val = ft_strjoin(prefix, exit_str);
+	free(prefix);
+	prefix = ft_strjoin(new_val, suffix);
+	free(new_val);
+	free(exit_str);
+	free(suffix);
+	free(tmp->value);
+	tmp->value = prefix;
 }

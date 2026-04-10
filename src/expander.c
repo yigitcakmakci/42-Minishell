@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:52 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 15:58:50 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/10 10:20:58 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,12 @@ static int	handle_dollar(t_token *tmp, int i, char **envp)
 
 	if (tmp->value[i + 1] == '?')
 	{
-		new_val = ft_itoa(g_exit_status);
-		printf("G_EXIT_STATUS : %s\n", new_val);
-		free(new_val);
-		return (0);
+		expand_exit_status(tmp, i);
+		return (1);
 	}
+	if (!tmp->value[i + 1] || (!ft_isalnum(tmp->value[i + 1])
+			&& tmp->value[i + 1] != '_'))
+		return (0);
 	new_val = sandwich(tmp->value, i, envp);
 	free(tmp->value);
 	tmp->value = new_val;
