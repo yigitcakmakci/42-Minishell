@@ -14,6 +14,23 @@
 #include "../libft/libft.h"
 #include <stdlib.h>
 
+/*
+** Her t_token node'unu ve içindeki value string'ini free'ler.
+** Lexer'dan dönen liste, syntax error veya exec bittikten sonra bununla temizlenir.
+*/
+void	free_token_list(t_token *tokens)
+{
+	t_token	*next;
+
+	while (tokens)
+	{
+		next = tokens->next;
+		free(tokens->value);
+		free(tokens);
+		tokens = next;
+	}
+}
+
 void	join_list(t_token **tokens)
 {
 	t_token	*tmp;

@@ -3,60 +3,75 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/04/13 14:08:08 by burozdem          #+#    #+#             */
-/*   Updated: 2026/04/13 14:12:24 by burozdem         ###   ########.fr       */
+/*   Created: 2026/04/13 00:00:00 by ycakmakc          #+#    #+#             */
+/*   Updated: 2026/04/13 00:00:00 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-#include "../include/minishell.h"
+#include "../../includes/minishell.h"
 #include <signal.h>
-#include <readline/readline.h>
 #include <unistd.h>
+#include <readline/readline.h>
 
-int	g_signal = 0;
-
-int	do_nothing(void)
+/*
+** Prompt modunda Ctrl+C basılınca:
+**   – mevcut satırı sil, yeni prompt göster
+**   – g_exit_status = 130 (bash standardı: 128 + SIGINT)
+** rl_replace_line / rl_on_new_line / rl_redisplay çağrıları
+** readline kütüphanesinin bu amaçla sağladığı signal‑safe fonksiyonlardır.
+*/
+static void	sig_int_prompt(int sig)
 {
-	return (0);
+	(void)sig;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_replace_line("", 0);
+	rl_on_new_line();
+	rl_redisplay();
+	g_exit_status = 130;
 }
 
-void	sig_pipe(int sig)
+/*
+** Heredoc modu: Ctrl+C basılınca readline'ı hemen bitir ve g_exit_status=130.
+** rl_done = 1 → readline mevcut buffer'ı (boş string) döndürür;
+** read_heredoc bunu g_exit_status üzerinden iptal olarak yorumlar.
+*/
+static void	sig_int_heredoc(int sig)
 {
-	int	i;
-
-	i = 3;
-	while (i < 1024)
-	{
-		close(i);
-		i++;
-	}
-	g_signal = sig;
+	(void)sig;
+	g_exit_status = 130;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_done = 1;
 }
 
-void	signal_switch(int status)
+/*
+** Heredoc okuma modu: SIGINT → readline'ı kes  |  SIGQUIT → yoksay
+** handle_heredoc başında çağrılır, bitince signal_prompt() ile onarılır.
+*/
+void	signal_heredoc(void)
 {
-	g_signal = 0;
-	if (status == 1)
-	{
-		rl_event_hook = NULL;
-		signal(SIGINT, sig_prompt);
-		signal(SIGPIPE, sig_pipe);
-		signal(SIGQUIT, SIG_IGN);
-	}
-	else if (status == 2)
-	{
-		rl_event_hook = NULL;
-		signal(SIGINT, sig_exc);
-		signal(SIGPIPE, sig_pipe);
-		signal(SIGQUIT, sig_cat_quit);
-	}
-	else if (status == 3)
-	{
-		rl_event_hook = do_nothing;
-		signal(SIGPIPE, sig_pipe);
-		signal(SIGINT, sig_heredoc);
-	}
+	signal(SIGINT, sig_int_heredoc);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+
+/*
+** Prompt modu:  SIGINT → satırı sıfırla  |  SIGQUIT → yoksay
+** Her yeni prompt döngüsünde çağrılır.
+*/
+void	signal_prompt(void)
+{
+	signal(SIGINT, sig_int_prompt);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+/*
+** Çalıştırma modu (child process içinde çağrılır):
+** Sinyalleri varsayılana döndür; böylece Ctrl+C/\ child'ı doğrudan keser.
+*/
+void	signal_exec(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 }

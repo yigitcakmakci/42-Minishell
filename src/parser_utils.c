@@ -31,6 +31,7 @@ t_cmd	*init_new_cmd(t_token *tokens)
 	new_node = malloc(sizeof(t_cmd));
 	if (!new_node)
 		return (NULL);
+	new_node->path = NULL;
 	new_node->infd = 0;
 	new_node->outfd = 1;
 	new_node->next = NULL;

@@ -78,7 +78,7 @@ int	handle_quotes(char *str)
 				i++;
 			if (!str[i])
 			{
-				printf("-------QUOTES ERROR!-------\n");
+				printf("minishell: syntax error: unclosed quote\n");
 				return (0);
 			}
 		}

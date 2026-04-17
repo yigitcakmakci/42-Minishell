@@ -17,13 +17,23 @@
 #include "../libft/libft.h"
 #include <stdlib.h>
 
-static void	read_heredoc(int tmp_fd, char *delimiter)
+/*
+** Ctrl+C gelince g_exit_status=130 → 0 döner (iptal).
+** Normal bitiş (delimiter veya Ctrl+D) → 1 döner.
+*/
+static int	read_heredoc(int tmp_fd, char *delimiter)
 {
 	char	*input;
 
+	signal_heredoc();
 	while (1)
 	{
 		input = readline("> ");
+		if (g_exit_status == 130)
+		{
+			free(input);
+			return (0);
+		}
 		if (!input)
 			break ;
 		if (ft_strncmp(input, delimiter, ft_strlen(delimiter) + 1) != 0)
@@ -37,6 +47,7 @@ static void	read_heredoc(int tmp_fd, char *delimiter)
 			break ;
 		}
 	}
+	return (1);
 }
 
 void	handle_heredoc(t_token **tokens, t_cmd *new_node)
@@ -46,7 +57,16 @@ void	handle_heredoc(t_token **tokens, t_cmd *new_node)
 
 	tmp_fd = open(".heredoc_tmp", O_CREAT | O_TRUNC | O_RDWR, 0777);
 	delimiter = ft_strdup((*tokens)->next->value);
-	read_heredoc(tmp_fd, delimiter);
+	if (!read_heredoc(tmp_fd, delimiter))
+	{
+		close(tmp_fd);
+		unlink(".heredoc_tmp");
+		free(delimiter);
+		new_node->infd = -1;
+		*tokens = (*tokens)->next;
+		signal_prompt();
+		return ;
+	}
 	close(tmp_fd);
 	new_node->infd = open(".heredoc_tmp", O_RDONLY);
 	unlink(".heredoc_tmp");

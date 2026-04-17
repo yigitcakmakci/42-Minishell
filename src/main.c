@@ -6,7 +6,7 @@
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:04 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 16:15:49 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/13 00:00:00 by ycakmakc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int			g_exit_status = 0;
+int	g_exit_status = 0;
 
-static void	debug_prints(t_token *tokens, t_cmd *cmds)
-{
-	int	i;
-
-	while (tokens)
-	{
-		printf("-------TOKENS-----\nVERİ: _%s_\nTÜR: _%d_\nRIF: _%d_\n",
-			tokens->value, tokens->type, tokens->rif);
-		printf("+++++++TOKENS++++++\n");
-		tokens = tokens->next;
-	}
-	while (cmds)
-	{
-		i = 0;
-		printf("-------CMDS-----\nINFD: _%d_\nOUTFD: _%d_\n", cmds->infd,
-			cmds->outfd);
-		while (cmds->args && cmds->args[i])
-		{
-			printf("ARGS[%d] = _%s_\n", i, cmds->args[i]);
-			i++;
-		}
-		printf("+++++++CMDS++++++\n");
-		cmds = cmds->next;
-	}
-}
-
-static void	process_input(char *input, char **envp)
+static void	process_input(char *input, char ***my_env)
 {
 	t_token	*tokens;
 	t_cmd	*cmds;
@@ -53,17 +27,24 @@ static void	process_input(char *input, char **envp)
 	tokens = lexical(input);
 	if (!tokens)
 		return ;
-	expander(tokens, envp);
-	cmds = parser(tokens, envp);
-	debug_prints(tokens, cmds);
+	expander(tokens, *my_env);
+	cmds = parser(tokens, *my_env);
+	free_token_list(tokens);
+	if (!cmds)
+		return ;
+	exec(cmds, my_env);
+	free_cmds(cmds);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	char	*input;
+	char	**my_env;
 
 	(void)argc;
 	(void)argv;
+	my_env = env_copy(envp);
+	signal_prompt();
 	while (1)
 	{
 		input = readline("minishell$ ");
@@ -73,8 +54,9 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		}
 		if (*input)
-			process_input(input, envp);
+			process_input(input, &my_env);
 		free(input);
 	}
-	return (0);
+	env_free(my_env);
+	return (g_exit_status);
 }

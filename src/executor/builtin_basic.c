@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_path.c                                        :+:      :+:    :+:   */
+/*   builtin_basic.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,45 +13,62 @@
 #include "../../includes/minishell.h"
 #include "../../libft/libft.h"
 #include <unistd.h>
-#include <stdlib.h>
 
-static void	free_split(char **arr)
+int	builtin_echo(t_cmd *cmd)
+{
+	int	i;
+	int	nl;
+
+	i = 1;
+	nl = 1;
+	if (cmd->args[1] && ft_strncmp(cmd->args[1], "-n", 3) == 0)
+	{
+		nl = 0;
+		i = 2;
+	}
+	while (cmd->args[i])
+	{
+		ft_putstr_fd(cmd->args[i], STDOUT_FILENO);
+		if (cmd->args[i + 1])
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		i++;
+	}
+	if (nl)
+		ft_putchar_fd('\n', STDOUT_FILENO);
+	return (0);
+}
+
+int	builtin_pwd(void)
+{
+	char	buf[4096];
+
+	if (!getcwd(buf, sizeof(buf)))
+		return (1);
+	ft_putstr_fd(buf, STDOUT_FILENO);
+	ft_putchar_fd('\n', STDOUT_FILENO);
+	return (0);
+}
+
+int	builtin_env(char **envp)
 {
 	int	i;
 
 	i = 0;
-	while (arr && arr[i])
-		free(arr[i++]);
-	free(arr);
+	while (envp[i])
+	{
+		if (ft_strchr(envp[i], '='))
+			ft_putendl_fd(envp[i], STDOUT_FILENO);
+		i++;
+	}
+	return (0);
 }
 
-char	*find_path(char *cmd, char **envp)
+int	builtin_unset(t_cmd *cmd, char ***envp)
 {
-	char	*path;
-	char	**dirs;
-	char	*tmp;
-	char	*full;
-	int		i;
+	int	i;
 
-	if (!cmd || !*cmd)
-		return (NULL);
-	if (ft_strchr(cmd, '/'))
-		return (access(cmd, X_OK) == 0 ? ft_strdup(cmd) : NULL);
-	path = env_get(envp, "PATH");
-	if (!path)
-		return (NULL);
-	dirs = ft_split(path, ':');
-	if (!dirs)
-		return (NULL);
-	i = -1;
-	while (dirs[++i])
-	{
-		tmp = ft_strjoin(dirs[i], "/");
-		full = ft_strjoin(tmp, cmd);
-		free(tmp);
-		if (access(full, X_OK) == 0)
-			return (free_split(dirs), full);
-		free(full);
-	}
-	return (free_split(dirs), NULL);
+	i = 1;
+	while (cmd->args[i])
+		env_unset(envp, cmd->args[i++]);
+	return (0);
 }

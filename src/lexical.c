@@ -62,7 +62,7 @@ t_token	*lexical(char *input)
 	}
 	if (!handle_list(tokens, input))
 	{
-		printf("\n<<<<<<<GEÇERSİZ ARGÜMAN>>>>>>>>\n");
+		free_token_list(tokens);
 		return (NULL);
 	}
 	return (tokens);

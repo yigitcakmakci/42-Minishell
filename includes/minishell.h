@@ -89,4 +89,28 @@ int					is_space(char c);
 int					is_operators(char c);
 int					is_quotes(char c);
 
+// LIST_MANAGEMENT.C (ek)
+void					free_token_list(t_token *tokens);
+
+// SIGNAL.C
+void					signal_prompt(void);
+void					signal_exec(void);
+void					signal_heredoc(void);
+
+// EXECUTOR/EXEC_ENV.C
+char					**env_copy(char **envp);
+void					env_free(char **envp);
+char					*env_get(char **envp, const char *key);
+void					env_set(char ***envp, const char *key, const char *val);
+void					env_unset(char ***envp, const char *key);
+char					*find_path(char *cmd, char **envp);
+
+// EXECUTOR/EXEC_BUILTIN.C
+int						is_builtin(char *name);
+int						exec_builtin(t_cmd *cmd, char ***envp);
+
+// EXECUTOR/EXEC.C
+void					exec(t_cmd *cmds, char ***envp);
+void					free_cmds(t_cmd *cmds);
+
 #endif

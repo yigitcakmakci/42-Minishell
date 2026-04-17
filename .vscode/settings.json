@@ -1,0 +1,21 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "git push": true,
+        "./minishell": true,
+        "make": true,
+        "printf": true,
+        "awk": true,
+        "/^cd /home/yigit/minishell && python3 - <<'PY'\nimport re,glob\npat=re\\.compile\\(r'\\^\\\\s\\*\\(\\?:static\\\\s\\+\\)\\?\\[\\\\w\\\\\\*\\\\s\\]\\+\\\\s\\+\\(\\\\w\\+\\)\\\\s\\*\\\\\\(\\[\\^;\\]\\*\\\\\\)\\\\s\\*\\$'\\)\nfor f in glob\\.glob\\('src/executor/\\*\\.c'\\)\\+\\['src/signal/signal\\.c'\\]:\n    with open\\(f\\) as fh: lines=fh\\.readlines\\(\\)\n    i=0\n    while i<len\\(lines\\):\n        m=pat\\.match\\(lines\\[i\\]\\)\n        if m and i\\+1<len\\(lines\\) and '\\{' in lines\\[i\\+1\\]:\n            name=m\\.group\\(1\\); start=i\\+1; depth=0; j=i\\+1\n            while j<len\\(lines\\):\n                depth \\+= lines\\[j\\]\\.count\\('\\{'\\)\n                depth -= lines\\[j\\]\\.count\\('\\}'\\)\n                if depth==0 and j>i\\+1: break\n                j\\+=1\n            print\\(f'\\{f\\}:\\{start\\+1\\} \\{name\\} lines=\\{j-start\\+1\\}'\\)\n            i=j\\+1\n        else:\n            i\\+=1\nPY$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/yigit/minishell && python3 - <<'PY'\nimport re,glob\npat=re\\.compile\\(r'\\^\\\\s\\*\\(\\?:static\\\\s\\+\\)\\?\\[\\\\w\\\\\\*\\\\s\\]\\+\\\\s\\+\\(\\\\w\\+\\)\\\\s\\*\\\\\\(\\[\\^;\\]\\*\\\\\\)\\\\s\\*\\$'\\)\nfor f in sorted\\(glob\\.glob\\('src/executor/\\*\\.c'\\)\\):\n    with open\\(f\\) as fh: lines=fh\\.readlines\\(\\)\n    funcs=\\[\\]; i=0\n    while i<len\\(lines\\):\n        m=pat\\.match\\(lines\\[i\\]\\)\n        if m and i\\+1<len\\(lines\\) and '\\{' in lines\\[i\\+1\\]:\n            name=m\\.group\\(1\\); s=i\\+1; d=0; j=i\\+1\n            while j<len\\(lines\\):\n                d \\+= lines\\[j\\]\\.count\\('\\{'\\)\n                d -= lines\\[j\\]\\.count\\('\\}'\\)\n                if d==0 and j>s: break\n                j\\+=1\n            funcs\\.append\\(\\(name,j-s\\+1,s\\+1\\)\\)\n            i=j\\+1\n        else:\n            i\\+=1\n    print\\(f'\\{f\\}: functions=\\{len\\(funcs\\)\\} max_lines=\\{max\\(\\(x\\[1\\] for x in funcs\\), default=0\\)\\}'\\)\nPY$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/yigit/minishell && python3 - <<'PY'\nimport re,glob\npat=re\\.compile\\(r'\\^\\\\s\\*\\(\\?:static\\\\s\\+\\)\\?\\[\\\\w\\\\\\*\\\\s\\]\\+\\\\s\\+\\(\\\\w\\+\\)\\\\s\\*\\\\\\(\\[\\^;\\]\\*\\\\\\)\\\\s\\*\\$'\\)\nfor f in sorted\\(glob\\.glob\\('src/executor/\\*\\.c'\\)\\):\n    with open\\(f\\) as fh: lines=fh\\.readlines\\(\\)\n    funcs=\\[\\]; i=0\n    while i<len\\(lines\\):\n        m=pat\\.match\\(lines\\[i\\]\\)\n        if m and i\\+1<len\\(lines\\) and '\\{' in lines\\[i\\+1\\]:\n            s=i\\+1; d=0; j=i\\+1\n            while j<len\\(lines\\):\n                d \\+= lines\\[j\\]\\.count\\('\\{'\\)\n                d -= lines\\[j\\]\\.count\\('\\}'\\)\n                if d==0 and j>s: break\n                j\\+=1\n            funcs\\.append\\(\\(m\\.group\\(1\\), j-s\\+1\\)\\)\n            i=j\\+1\n        else:\n            i\\+=1\n    mx=max\\(\\(l for _,l in funcs\\),default=0\\)\n    print\\(f'\\{f\\}: funcs=\\{len\\(funcs\\)\\} max=\\{mx\\}'\\)\nPY$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
