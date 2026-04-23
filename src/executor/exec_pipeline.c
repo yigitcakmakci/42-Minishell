@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/22 20:35:18 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/24 00:37:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,28 +18,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void	setup_child_fds(t_cmd *cmd, int in, int out)
+static void	child_cleanup(t_shell *shell, char *path, int code)
 {
-	if (in != 0)
-	{
-		dup2(in, 0);
-		close(in);
-	}
-	if (out != 1)
-	{
-		dup2(out, 1);
-		close(out);
-	}
-	if (cmd->infd > 2)
-	{
-		dup2(cmd->infd, 0);
-		close(cmd->infd);
-	}
-	if (cmd->outfd > 2)
-	{
-		dup2(cmd->outfd, 1);
-		close(cmd->outfd);
-	}
+	free(path);
+	gc_free_all(&shell->gc);
+	env_free(shell->envp);
+	exit(code);
 }
 
 static void	child_exec(t_cmd *cmd, int in, int out, t_shell *shell)
@@ -49,17 +33,17 @@ static void	child_exec(t_cmd *cmd, int in, int out, t_shell *shell)
 	signal_exec();
 	setup_child_fds(cmd, in, out);
 	if (is_builtin(cmd->args[0]))
-		exit(exec_builtin(cmd, shell));
+		child_cleanup(shell, NULL, exec_builtin(cmd, shell));
 	path = find_path(cmd->args[0], shell);
 	if (!path)
 	{
 		ft_putstr_fd(cmd->args[0], 2);
 		ft_putendl_fd(": command not found", 2);
-		exit(127);
+		child_cleanup(shell, NULL, 127);
 	}
 	execve(path, cmd->args, shell->envp);
 	perror(cmd->args[0]);
-	exit(126);
+	child_cleanup(shell, path, 126);
 }
 
 static int	wait_all(pid_t last)

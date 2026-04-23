@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 00:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 20:39:39 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/24 00:37:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,30 @@
 #include <signal.h>
 
 void	exec_pipeline(t_cmd *cmds, t_shell *shell);
+
+void	setup_child_fds(t_cmd *cmd, int in, int out)
+{
+	if (in != 0)
+	{
+		dup2(in, 0);
+		close(in);
+	}
+	if (out != 1)
+	{
+		dup2(out, 1);
+		close(out);
+	}
+	if (cmd->infd > 2)
+	{
+		dup2(cmd->infd, 0);
+		close(cmd->infd);
+	}
+	if (cmd->outfd > 2)
+	{
+		dup2(cmd->outfd, 1);
+		close(cmd->outfd);
+	}
+}
 
 void	free_cmds(t_cmd *cmds)
 {

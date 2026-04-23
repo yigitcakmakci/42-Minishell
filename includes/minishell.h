@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:50:31 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 22:53:44 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/24 00:37:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,7 @@ char				*find_path(char *cmd, t_shell *shell);
 int					is_builtin(char *name);
 int					exec_builtin(t_cmd *cmd, t_shell *shell);
 
+void				setup_child_fds(t_cmd *cmd, int in, int out);
 void				exec_pipeline(t_cmd *cmds, t_shell *shell);
 
 void				exec(t_cmd *cmds, t_shell *shell);

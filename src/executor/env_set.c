@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 20:40:41 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/24 00:37:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,17 @@
 static char	*build_entry(const char *key, const char *val, t_shell *shell)
 {
 	char	*tmp;
+	char	*result;
 
+	(void)shell;
 	if (!val)
-		return (gc_strdup(key, &shell->gc));
-	tmp = gc_strjoin(key, "=", &shell->gc);
+		return (ft_strdup(key));
+	tmp = ft_strjoin(key, "=");
 	if (!tmp)
 		return (NULL);
-	return (gc_strjoin(tmp, val, &shell->gc));
+	result = ft_strjoin(tmp, val);
+	free(tmp);
+	return (result);
 }
 
 static char	**grow_env(char **old, char *entry, t_shell *shell)
@@ -32,10 +36,13 @@ static char	**grow_env(char **old, char *entry, t_shell *shell)
 	int		len;
 	int		i;
 
+	(void)shell;
 	len = 0;
 	while (old && old[len])
 		len++;
-	new_env = gc_malloc(sizeof(char *) * (len + 2), &shell->gc);
+	new_env = malloc(sizeof(char *) * (len + 2));
+	if (!new_env)
+		return (old);
 	i = 0;
 	while (i < len)
 	{
@@ -44,6 +51,7 @@ static char	**grow_env(char **old, char *entry, t_shell *shell)
 	}
 	new_env[len] = entry;
 	new_env[len + 1] = NULL;
+	free(old);
 	return (new_env);
 }
 
@@ -54,6 +62,7 @@ static int	update_existing(char **envp, const char *key, const char *val,
 	int		klen;
 	char	*entry;
 
+	(void)shell;
 	klen = ft_strlen(key);
 	i = -1;
 	while (envp && envp[++i])
@@ -63,9 +72,12 @@ static int	update_existing(char **envp, const char *key, const char *val,
 		{
 			if (!val)
 				return (1);
-			entry = build_entry(key, val, shell);
+			entry = build_entry(key, val, NULL);
 			if (entry)
+			{
+				free(envp[i]);
 				envp[i] = entry;
+			}
 			return (1);
 		}
 	}
@@ -78,7 +90,7 @@ void	env_set(char ***envp, const char *key, const char *val, t_shell *shell)
 
 	if (update_existing(*envp, key, val, shell))
 		return ;
-	entry = build_entry(key, val, shell);
+	entry = build_entry(key, val, NULL);
 	if (entry)
 		*envp = grow_env(*envp, entry, shell);
 }

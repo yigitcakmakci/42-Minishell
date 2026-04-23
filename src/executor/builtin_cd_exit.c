@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 23:38:43 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/24 00:37:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int	builtin_cd(t_cmd *cmd, t_shell *shell)
 		return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 1);
 	old = env_get(shell->envp, "PWD");
 	if (old)
-		env_set(&shell->envp, "OLDPWD", old, shell);
+		old = gc_strdup(old, &shell->gc);
 	if (chdir(target) != 0)
 	{
 		ft_putstr_fd("minishell: cd: ", 2);
@@ -60,6 +60,8 @@ int	builtin_cd(t_cmd *cmd, t_shell *shell)
 	}
 	if (getcwd(cwd, sizeof(cwd)))
 		env_set(&shell->envp, "PWD", cwd, shell);
+	if (old)
+		env_set(&shell->envp, "OLDPWD", old, shell);
 	return (0);
 }
 
@@ -91,6 +93,8 @@ static void	exit_cleanup(t_shell *shell)
 	gc_free_all(&shell->gc);
 	if (shell->input)
 		free(shell->input);
+	env_free(shell->envp);
+	shell->envp = NULL;
 	rl_clear_history();
 }
 

@@ -1,0 +1,24 @@
+{
+   readline_leaks
+   Memcheck:Leak
+   ...
+   obj:*/libreadline*
+}
+{
+   readline_leaks2
+   Memcheck:Leak
+   ...
+   fun:readline
+}
+{
+   readline_add_history
+   Memcheck:Leak
+   ...
+   fun:add_history
+}
+{
+   readline_rl_clear_history
+   Memcheck:Leak
+   ...
+   fun:rl_clear_history
+}

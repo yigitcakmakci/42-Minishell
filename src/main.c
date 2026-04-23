@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:04 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 21:15:09 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/24 00:37:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,10 @@ int	main(int argc, char **argv, char **envp)
 			process_input(input, &shell);
 		free(input);
 		shell.input = NULL;
+		gc_free_all(&shell.gc);
 	}
 	gc_free_all(&shell.gc);
+	env_free(shell.envp);
 	rl_clear_history();
 	return (g_exit_status);
 }
