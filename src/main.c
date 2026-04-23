@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:04 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/22 21:55:28 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 21:15:09 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,14 @@ static void	process_input(char *input, t_shell *shell)
 	close_cmd_fds(cmds);
 }
 
+static void	init_shell(t_shell *shell, char **envp)
+{
+	shell->gc = NULL;
+	shell->input = NULL;
+	shell->envp = env_copy(envp, shell);
+	signal_prompt();
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
@@ -42,12 +50,11 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
-	shell.gc = NULL;
-	shell.envp = env_copy(envp, &shell);
-	signal_prompt();
+	init_shell(&shell, envp);
 	while (1)
 	{
 		input = readline("minishell:");
+		shell.input = input;
 		if (!input)
 		{
 			printf("exit\n");
@@ -56,7 +63,9 @@ int	main(int argc, char **argv, char **envp)
 		if (*input)
 			process_input(input, &shell);
 		free(input);
+		shell.input = NULL;
 	}
 	gc_free_all(&shell.gc);
+	rl_clear_history();
 	return (g_exit_status);
 }

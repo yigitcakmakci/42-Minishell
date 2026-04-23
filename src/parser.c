@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:10 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/22 20:41:16 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 19:35:49 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,10 @@ static int	is_redir_token(t_token_type type)
 	return (0);
 }
 
-static void	handle_word(t_cmd *node, t_token *tok, int *i)
+static void	handle_word(t_cmd *node, t_token *tok, int *i, t_shell *shell)
 {
 	if (tok->type != WORD || tok->value[0])
-		node->args[(*i)++] = ft_strdup(tok->value);
+		node->args[(*i)++] = gc_strdup(tok->value, &shell->gc);
 }
 
 void	convert_command(t_token *tokens, t_cmd **cmds, t_shell *shell)
@@ -58,7 +58,7 @@ void	convert_command(t_token *tokens, t_cmd **cmds, t_shell *shell)
 			i = 0;
 		}
 		if (is_word_token(tokens->type))
-			handle_word(new_node, tokens, &i);
+			handle_word(new_node, tokens, &i, shell);
 		else if (is_redir_token(tokens->type))
 			convert_redirection(&tokens, new_node, shell);
 		else if (tokens->type == HEREDOC)

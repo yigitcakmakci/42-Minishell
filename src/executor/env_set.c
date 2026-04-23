@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/22 20:27:28 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 20:40:41 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,16 @@
 #include "../../libft/libft.h"
 #include <stdlib.h>
 
-static char	*build_entry(const char *key, const char *val)
+static char	*build_entry(const char *key, const char *val, t_shell *shell)
 {
 	char	*tmp;
-	char	*out;
 
 	if (!val)
-		return (ft_strdup(key));
-	tmp = ft_strjoin(key, "=");
+		return (gc_strdup(key, &shell->gc));
+	tmp = gc_strjoin(key, "=", &shell->gc);
 	if (!tmp)
 		return (NULL);
-	out = ft_strjoin(tmp, val);
-	free(tmp);
-	return (out);
+	return (gc_strjoin(tmp, val, &shell->gc));
 }
 
 static char	**grow_env(char **old, char *entry, t_shell *shell)
@@ -47,11 +44,11 @@ static char	**grow_env(char **old, char *entry, t_shell *shell)
 	}
 	new_env[len] = entry;
 	new_env[len + 1] = NULL;
-	free(old);
 	return (new_env);
 }
 
-static int	update_existing(char **envp, const char *key, const char *val)
+static int	update_existing(char **envp, const char *key, const char *val,
+		t_shell *shell)
 {
 	int		i;
 	int		klen;
@@ -66,12 +63,9 @@ static int	update_existing(char **envp, const char *key, const char *val)
 		{
 			if (!val)
 				return (1);
-			entry = build_entry(key, val);
+			entry = build_entry(key, val, shell);
 			if (entry)
-			{
-				free(envp[i]);
 				envp[i] = entry;
-			}
 			return (1);
 		}
 	}
@@ -82,9 +76,9 @@ void	env_set(char ***envp, const char *key, const char *val, t_shell *shell)
 {
 	char	*entry;
 
-	if (update_existing(*envp, key, val))
+	if (update_existing(*envp, key, val, shell))
 		return ;
-	entry = build_entry(key, val);
+	entry = build_entry(key, val, shell);
 	if (entry)
 		*envp = grow_env(*envp, entry, shell);
 }

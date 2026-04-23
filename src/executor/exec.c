@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 00:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 20:37:48 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/23 20:39:39 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,48 +21,35 @@ void	exec_pipeline(t_cmd *cmds, t_shell *shell);
 void	free_cmds(t_cmd *cmds)
 {
 	t_cmd	*next;
-	int		i;
 
 	while (cmds)
 	{
 		next = cmds->next;
-		if (cmds->args)
-		{
-			i = 0;
-			while (cmds->args[i])
-				free(cmds->args[i++]);
-			free(cmds->args);
-		}
-		free(cmds->path);
 		if (cmds->infd > 2)
 			close(cmds->infd);
 		if (cmds->outfd > 2)
 			close(cmds->outfd);
-		free(cmds);
 		cmds = next;
 	}
 }
 
-/* ──────────────────── Tek komut / built‑in çalıştır ─────────────── */
-
-/*
-** Tek komutsa VE built‑in ise parent process'te çalıştır.
-** (cd, export, unset gibi built‑in'lerin shell'i etkilemesi gerekir.)
-** Yine de infd/outfd yönlendirmesi uygulanır; sonra orijinale döner.
-*/
 static void	exec_single_builtin(t_cmd *cmd, t_shell *shell)
 {
 	int	saved_in;
 	int	saved_out;
 
+	if (ft_strncmp(cmd->args[0], "exit", 5) == 0)
+	{
+		ft_putendl_fd("exit", 2);
+		g_exit_status = exec_builtin(cmd, shell);
+		return ;
+	}
 	saved_in = dup(STDIN_FILENO);
 	saved_out = dup(STDOUT_FILENO);
 	if (cmd->infd != STDIN_FILENO)
 		dup2(cmd->infd, STDIN_FILENO);
 	if (cmd->outfd != STDOUT_FILENO)
 		dup2(cmd->outfd, STDOUT_FILENO);
-	if (ft_strncmp(cmd->args[0], "exit", 5) == 0)
-		ft_putendl_fd("exit", 2);
 	g_exit_status = exec_builtin(cmd, shell);
 	dup2(saved_in, STDIN_FILENO);
 	dup2(saved_out, STDOUT_FILENO);

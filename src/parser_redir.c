@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/22 06:51:13 by burozdem          #+#    #+#             */
-/*   Updated: 2026/04/22 21:59:21 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 20:52:16 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,14 +100,16 @@ void	convert_redirection(t_token **tokens, t_cmd *new_node, t_shell *shell)
 
 	(void)shell;
 	flags = O_CREAT | O_TRUNC | O_RDWR;
+	if ((*tokens)->type == RED_IN && new_node->infd > 2)
+		close(new_node->infd);
+	if (((*tokens)->type == RED_OUT || (*tokens)->type == APPEND)
+		&& new_node->outfd > 2)
+		close(new_node->outfd);
 	if ((*tokens)->type == RED_IN)
 		new_node->infd = open((*tokens)->next->value, O_RDONLY, 0777);
 	else if ((*tokens)->type == RED_OUT)
 		new_node->outfd = open((*tokens)->next->value, flags, 0777);
 	else if ((*tokens)->type == APPEND)
-		new_node->outfd = open((*tokens)->next->value,
-				O_CREAT | O_APPEND | O_WRONLY, 0777);
-	else if ((*tokens)->type == HEREDOC)
 		new_node->outfd = open((*tokens)->next->value,
 				O_CREAT | O_APPEND | O_WRONLY, 0777);
 	*tokens = (*tokens)->next;

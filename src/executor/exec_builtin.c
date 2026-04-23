@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 00:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/21 20:12:40 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 19:49:46 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,6 @@ int	exec_builtin(t_cmd *cmd, t_shell *shell)
 	if (ft_strncmp(cmd->args[0], "unset", 6) == 0)
 		return (builtin_unset(cmd, shell));
 	if (ft_strncmp(cmd->args[0], "exit", 5) == 0)
-		return (builtin_exit(cmd));
+		return (builtin_exit(cmd, shell));
 	return (127);
 }

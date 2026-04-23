@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/22 20:22:31 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 21:58:10 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 #include "../../libft/libft.h"
 #include <stdlib.h>
 
-static void	free_partial(char **copy, int i)
+static void	free_partial(char **copy, int i, t_shell *shell)
 {
-	while (i > 0)
-		free(copy[--i]);
-	free(copy);
+	(void)copy;
+	(void)i;
+	gc_free_all(&shell->gc);
 }
 
 char	**env_copy(char **envp, t_shell *shell)
@@ -34,10 +34,9 @@ char	**env_copy(char **envp, t_shell *shell)
 	i = 0;
 	while (i < len)
 	{
-		copy[i] = ft_strdup(envp[i]);
+		copy[i] = gc_strdup(envp[i], &shell->gc);
 		if (!copy[i])
-			return (free_partial(copy, i), NULL);
-		ft_lstadd_back(&shell->gc, ft_lstnew(copy[i]));
+			return (free_partial(copy, i, shell), NULL);
 		i++;
 	}
 	copy[i] = NULL;
@@ -89,7 +88,6 @@ void	env_unset(char ***envp, const char *key)
 		if (ft_strncmp((*envp)[i], key, klen) == 0
 			&& ((*envp)[i][klen] == '=' || (*envp)[i][klen] == '\0'))
 		{
-			free((*envp)[i]);
 			j = i;
 			while ((*envp)[j])
 			{

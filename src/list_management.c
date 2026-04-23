@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:01 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/22 20:45:54 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 20:40:12 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,12 +94,5 @@ int	add_word_to_list(t_token **tokens, char *str, t_token_type type,
 
 void	free_token_list(t_token *tokens)
 {
-	t_token	*tmp;
-
-	while (tokens)
-	{
-		tmp = tokens->next;
-		free(tokens);
-		tokens = tmp;
-	}
+	(void)tokens;
 }
