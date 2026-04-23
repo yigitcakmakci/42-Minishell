@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_basic.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/13 12:00:00 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 00:51:35 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ int	builtin_echo(t_cmd *cmd)
 
 	i = 1;
 	nl = 1;
-	if (cmd->args[1] && ft_strncmp(cmd->args[1], "-n", 3) == 0)
+	while (cmd->args[i] && ft_strncmp(cmd->args[i], "-n", 3) == 0)
 	{
 		nl = 0;
-		i = 2;
+		i++;
 	}
 	while (cmd->args[i])
 	{
@@ -63,12 +63,12 @@ int	builtin_env(char **envp)
 	return (0);
 }
 
-int	builtin_unset(t_cmd *cmd, char ***envp)
+int	builtin_unset(t_cmd *cmd, t_shell *shell)
 {
 	int	i;
 
 	i = 1;
 	while (cmd->args[i])
-		env_unset(envp, cmd->args[i++]);
+		env_unset(&shell->envp, cmd->args[i++]);
 	return (0);
 }

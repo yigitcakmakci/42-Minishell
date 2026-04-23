@@ -3,23 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtin.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 00:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/13 00:00:00 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/21 20:12:40 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 #include "../../libft/libft.h"
-
-int	builtin_echo(t_cmd *cmd);
-int	builtin_pwd(void);
-int	builtin_cd(t_cmd *cmd, char ***envp);
-int	builtin_env(char **envp);
-int	builtin_export(t_cmd *cmd, char ***envp);
-int	builtin_unset(t_cmd *cmd, char ***envp);
-int	builtin_exit(t_cmd *cmd);
 
 int	is_builtin(char *name)
 {
@@ -34,7 +26,7 @@ int	is_builtin(char *name)
 		|| ft_strncmp(name, "exit", 5) == 0);
 }
 
-int	exec_builtin(t_cmd *cmd, char ***envp)
+int	exec_builtin(t_cmd *cmd, t_shell *shell)
 {
 	if (!cmd || !cmd->args || !cmd->args[0])
 		return (1);
@@ -43,13 +35,13 @@ int	exec_builtin(t_cmd *cmd, char ***envp)
 	if (ft_strncmp(cmd->args[0], "pwd", 4) == 0)
 		return (builtin_pwd());
 	if (ft_strncmp(cmd->args[0], "cd", 3) == 0)
-		return (builtin_cd(cmd, envp));
+		return (builtin_cd(cmd, shell));
 	if (ft_strncmp(cmd->args[0], "env", 4) == 0)
-		return (builtin_env(*envp));
+		return (builtin_env(shell->envp));
 	if (ft_strncmp(cmd->args[0], "export", 7) == 0)
-		return (builtin_export(cmd, envp));
+		return (builtin_export(cmd, shell));
 	if (ft_strncmp(cmd->args[0], "unset", 6) == 0)
-		return (builtin_unset(cmd, envp));
+		return (builtin_unset(cmd, shell));
 	if (ft_strncmp(cmd->args[0], "exit", 5) == 0)
 		return (builtin_exit(cmd));
 	return (127);

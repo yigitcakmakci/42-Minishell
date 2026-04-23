@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_manage.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/13 12:00:00 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:22:31 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static void	free_partial(char **copy, int i)
 	free(copy);
 }
 
-char	**env_copy(char **envp)
+char	**env_copy(char **envp, t_shell *shell)
 {
 	char	**copy;
 	int		len;
@@ -30,15 +30,14 @@ char	**env_copy(char **envp)
 	len = 0;
 	while (envp && envp[len])
 		len++;
-	copy = malloc(sizeof(char *) * (len + 1));
-	if (!copy)
-		return (NULL);
+	copy = gc_malloc(sizeof(char *) * (len + 1), &shell->gc);
 	i = 0;
 	while (i < len)
 	{
 		copy[i] = ft_strdup(envp[i]);
 		if (!copy[i])
 			return (free_partial(copy, i), NULL);
+		ft_lstadd_back(&shell->gc, ft_lstnew(copy[i]));
 		i++;
 	}
 	copy[i] = NULL;

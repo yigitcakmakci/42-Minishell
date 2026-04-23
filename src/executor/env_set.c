@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_set.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/13 12:00:00 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:27:28 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static char	*build_entry(const char *key, const char *val)
 	return (out);
 }
 
-static char	**grow_env(char **old, char *entry)
+static char	**grow_env(char **old, char *entry, t_shell *shell)
 {
 	char	**new_env;
 	int		len;
@@ -38,9 +38,7 @@ static char	**grow_env(char **old, char *entry)
 	len = 0;
 	while (old && old[len])
 		len++;
-	new_env = malloc(sizeof(char *) * (len + 2));
-	if (!new_env)
-		return (NULL);
+	new_env = gc_malloc(sizeof(char *) * (len + 2), &shell->gc);
 	i = 0;
 	while (i < len)
 	{
@@ -53,29 +51,40 @@ static char	**grow_env(char **old, char *entry)
 	return (new_env);
 }
 
-void	env_set(char ***envp, const char *key, const char *val)
+static int	update_existing(char **envp, const char *key, const char *val)
 {
-	int		klen;
 	int		i;
+	int		klen;
 	char	*entry;
 
-	klen = (int)ft_strlen(key);
-	i = 0;
-	while ((*envp) && (*envp)[i])
+	klen = ft_strlen(key);
+	i = -1;
+	while (envp && envp[++i])
 	{
-		if (ft_strncmp((*envp)[i], key, klen) == 0
-			&& ((*envp)[i][klen] == '=' || (*envp)[i][klen] == '\0'))
+		if (ft_strncmp(envp[i], key, klen) == 0
+			&& (envp[i][klen] == '=' || envp[i][klen] == '\0'))
 		{
 			if (!val)
-				return ;
+				return (1);
 			entry = build_entry(key, val);
 			if (entry)
-				free((*envp)[i]), (*envp)[i] = entry;
-			return ;
+			{
+				free(envp[i]);
+				envp[i] = entry;
+			}
+			return (1);
 		}
-		i++;
 	}
+	return (0);
+}
+
+void	env_set(char ***envp, const char *key, const char *val, t_shell *shell)
+{
+	char	*entry;
+
+	if (update_existing(*envp, key, val))
+		return ;
 	entry = build_entry(key, val);
 	if (entry)
-		*envp = grow_env(*envp, entry);
+		*envp = grow_env(*envp, entry, shell);
 }

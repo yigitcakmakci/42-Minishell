@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list_management.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:01 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 15:48:14 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:45:54 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,7 @@
 #include "../libft/libft.h"
 #include <stdlib.h>
 
-/*
-** Her t_token node'unu ve içindeki value string'ini free'ler.
-** Lexer'dan dönen liste, syntax error veya exec bittikten sonra bununla temizlenir.
-*/
-void	free_token_list(t_token *tokens)
-{
-	t_token	*next;
-
-	while (tokens)
-	{
-		next = tokens->next;
-		free(tokens->value);
-		free(tokens);
-		tokens = next;
-	}
-}
-
-void	join_list(t_token **tokens)
+void	join_list(t_token **tokens, t_shell *shell)
 {
 	t_token	*tmp;
 	t_token	*next_node;
@@ -39,28 +22,16 @@ void	join_list(t_token **tokens)
 
 	tmp = *tokens;
 	next_node = tmp->next;
-	new_val = ft_strjoin(tmp->value, next_node->value);
+	new_val = gc_strjoin(tmp->value, next_node->value, &shell->gc);
 	tmp->rif = next_node->rif;
 	tmp->next = next_node->next;
-	free(tmp->value);
-	free(next_node->value);
-	free(next_node);
 	tmp->value = new_val;
 }
 
-static void	add_list_str(t_token **tokens, char *content, t_token_type type,
-		int rif)
+static void	add_node_back(t_token **tokens, t_token *new_node)
 {
-	t_token	*new_node;
 	t_token	*tmp;
 
-	new_node = malloc(sizeof(t_token));
-	if (!new_node)
-		return ;
-	new_node->type = type;
-	new_node->value = content;
-	new_node->rif = rif;
-	new_node->next = NULL;
 	if (*tokens == NULL)
 		*tokens = new_node;
 	else
@@ -97,20 +68,38 @@ static int	get_token_len(char *str, t_token_type type)
 	return (len);
 }
 
-int	add_word_to_list(t_token **tokens, char *str, t_token_type type)
+int	add_word_to_list(t_token **tokens, char *str, t_token_type type,
+		t_shell *shell)
 {
 	int		len;
-	char	*token;
 	int		rif;
+	t_token	*new;
 
-	rif = 0;
 	len = get_token_len(str, type);
-	token = ft_substr(str, 0, len);
+	rif = 0;
 	if ((type == SINGLE_QUOTES || type == DOUBLE_QUOTES || type == WORD)
 		&& str[len] && !is_space(str[len]) && !is_operators(str[len]))
-	{
 		rif = 1;
+	new = gc_malloc(sizeof(t_token), &shell->gc);
+	if (new)
+	{
+		new->type = type;
+		new->value = gc_substr(str, 0, len, &shell->gc);
+		new->rif = rif;
+		new->next = NULL;
+		add_node_back(tokens, new);
 	}
-	add_list_str(tokens, token, type, rif);
 	return (len);
+}
+
+void	free_token_list(t_token *tokens)
+{
+	t_token	*tmp;
+
+	while (tokens)
+	{
+		tmp = tokens->next;
+		free(tokens);
+		tokens = tmp;
+	}
 }

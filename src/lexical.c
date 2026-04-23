@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexical.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:58 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/10 09:58:39 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:40:02 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,28 @@ static int	handle_list(t_token *tokens, char *input)
 	return (1);
 }
 
-static int	process_token(t_token **tokens, char *input, int i)
+static int	process_token(t_token **tokens, char *input, int i, t_shell *shell)
 {
 	if (input[i] == 34)
-		return (add_word_to_list(tokens, &input[i], DOUBLE_QUOTES));
+		return (add_word_to_list(tokens, &input[i], DOUBLE_QUOTES, shell));
 	if (input[i] == 39)
-		return (add_word_to_list(tokens, &input[i], SINGLE_QUOTES));
+		return (add_word_to_list(tokens, &input[i], SINGLE_QUOTES, shell));
 	if (is_word(input[i]))
-		return (add_word_to_list(tokens, &input[i], WORD));
+		return (add_word_to_list(tokens, &input[i], WORD, shell));
 	if (input[i] == '<' && input[i + 1] == '<')
-		return (add_word_to_list(tokens, &input[i], HEREDOC));
+		return (add_word_to_list(tokens, &input[i], HEREDOC, shell));
 	if (input[i] == '<')
-		return (add_word_to_list(tokens, &input[i], RED_IN));
+		return (add_word_to_list(tokens, &input[i], RED_IN, shell));
 	if (input[i] == '>' && input[i + 1] == '>')
-		return (add_word_to_list(tokens, &input[i], APPEND));
+		return (add_word_to_list(tokens, &input[i], APPEND, shell));
 	if (input[i] == '>')
-		return (add_word_to_list(tokens, &input[i], RED_OUT));
+		return (add_word_to_list(tokens, &input[i], RED_OUT, shell));
 	if (input[i] == '|')
-		return (add_word_to_list(tokens, &input[i], PIPE));
+		return (add_word_to_list(tokens, &input[i], PIPE, shell));
 	return (1);
 }
 
-t_token	*lexical(char *input)
+t_token	*lexical(char	*input, t_shell	*shell)
 {
 	t_token	*tokens;
 	int		i;
@@ -58,7 +58,7 @@ t_token	*lexical(char *input)
 			i++;
 		if (!input[i])
 			break ;
-		i += process_token(&tokens, input, i);
+		i += process_token(&tokens, input, i, shell);
 	}
 	if (!handle_list(tokens, input))
 	{

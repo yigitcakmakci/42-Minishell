@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_path.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/13 12:00:00 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:32:14 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,24 +25,12 @@ static void	free_split(char **arr)
 	free(arr);
 }
 
-char	*find_path(char *cmd, char **envp)
+static char	*check_dirs(char **dirs, char *cmd)
 {
-	char	*path;
-	char	**dirs;
 	char	*tmp;
 	char	*full;
 	int		i;
 
-	if (!cmd || !*cmd)
-		return (NULL);
-	if (ft_strchr(cmd, '/'))
-		return (access(cmd, X_OK) == 0 ? ft_strdup(cmd) : NULL);
-	path = env_get(envp, "PATH");
-	if (!path)
-		return (NULL);
-	dirs = ft_split(path, ':');
-	if (!dirs)
-		return (NULL);
 	i = -1;
 	while (dirs[++i])
 	{
@@ -50,8 +38,33 @@ char	*find_path(char *cmd, char **envp)
 		full = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (access(full, X_OK) == 0)
-			return (free_split(dirs), full);
+			return (full);
 		free(full);
 	}
-	return (free_split(dirs), NULL);
+	return (NULL);
+}
+
+char	*find_path(char *cmd, t_shell *shell)
+{
+	char	*path;
+	char	**dirs;
+	char	*res;
+
+	if (!cmd || !*cmd)
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
+		return (NULL);
+	}
+	path = env_get(shell->envp, "PATH");
+	if (!path)
+		return (NULL);
+	dirs = ft_split(path, ':');
+	if (!dirs)
+		return (NULL);
+	res = check_dirs(dirs, cmd);
+	free_split(dirs);
+	return (res);
 }

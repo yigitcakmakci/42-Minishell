@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:49 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/10 10:20:58 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:38:00 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 #include "../libft/libft.h"
 #include <stdlib.h>
 
-char	*get_env_val(char *var_name, char **envp)
+char	*get_env_val(char *var_name, t_shell *shell)
 {
-	int	i;
-	int	len;
+	int		i;
+	int		len;
+	char	**envp;
 
+	envp = shell->envp;
 	i = 0;
 	len = ft_strlen(var_name);
 	while (envp[i])
@@ -30,7 +32,7 @@ char	*get_env_val(char *var_name, char **envp)
 	return (ft_strdup(""));
 }
 
-char	*sandwich(char *str, int ch_addr, char **envp)
+char	*sandwich(char *str, int ch_addr, t_shell *shell)
 {
 	int		v_end;
 	char	*v_name;
@@ -43,7 +45,7 @@ char	*sandwich(char *str, int ch_addr, char **envp)
 	if (v_end - (ch_addr + 1) == 0)
 		return (ft_strdup(str));
 	v_name = ft_substr(str, ch_addr + 1, v_end - (ch_addr + 1));
-	val = get_env_val(v_name, envp);
+	val = get_env_val(v_name, shell);
 	p[0] = ft_substr(str, 0, ch_addr);
 	p[1] = ft_strdup(str + v_end);
 	p[2] = ft_strjoin(p[0], val);
@@ -80,13 +82,14 @@ int	count_quotes(char *str)
 	return (count);
 }
 
-void	expand_exit_status(t_token *tmp, int i)
+void	expand_exit_status(t_token *tmp, int i, t_shell *shell)
 {
 	char	*exit_str;
 	char	*prefix;
 	char	*suffix;
 	char	*new_val;
 
+	(void)shell;
 	exit_str = ft_itoa(g_exit_status);
 	prefix = ft_substr(tmp->value, 0, i);
 	suffix = ft_strdup(tmp->value + i + 2);
@@ -98,4 +101,26 @@ void	expand_exit_status(t_token *tmp, int i)
 	free(suffix);
 	free(tmp->value);
 	tmp->value = prefix;
+}
+
+void	write_expanded_line(int fd, char *line, t_shell *shell)
+{
+	char	*expanded;
+	int		i;
+
+	expanded = ft_strdup(line);
+	i = 0;
+	while (expanded && expanded[i])
+	{
+		if (expanded[i] == '$' && expanded[i + 1]
+			&& (ft_isalnum(expanded[i + 1]) || expanded[i + 1] == '_'))
+		{
+			expanded = sandwich(expanded, i, shell);
+			continue ;
+		}
+		i++;
+	}
+	ft_putendl_fd(expanded, fd);
+	free(expanded);
+	free(line);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/13 12:00:00 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/22 20:35:18 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,33 +15,50 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-static void	child_exec(t_cmd *cmd, int in, int out, char ***envp)
+static void	setup_child_fds(t_cmd *cmd, int in, int out)
+{
+	if (in != 0)
+	{
+		dup2(in, 0);
+		close(in);
+	}
+	if (out != 1)
+	{
+		dup2(out, 1);
+		close(out);
+	}
+	if (cmd->infd > 2)
+	{
+		dup2(cmd->infd, 0);
+		close(cmd->infd);
+	}
+	if (cmd->outfd > 2)
+	{
+		dup2(cmd->outfd, 1);
+		close(cmd->outfd);
+	}
+}
+
+static void	child_exec(t_cmd *cmd, int in, int out, t_shell *shell)
 {
 	char	*path;
 
 	signal_exec();
-	if (in != 0)
-		dup2(in, 0), close(in);
-	if (out != 1)
-		dup2(out, 1), close(out);
-	if (cmd->infd > 2)
-		dup2(cmd->infd, 0), close(cmd->infd);
-	if (cmd->outfd > 2)
-		dup2(cmd->outfd, 1), close(cmd->outfd);
+	setup_child_fds(cmd, in, out);
 	if (is_builtin(cmd->args[0]))
-		exit(exec_builtin(cmd, envp));
-	path = find_path(cmd->args[0], *envp);
+		exit(exec_builtin(cmd, shell));
+	path = find_path(cmd->args[0], shell);
 	if (!path)
 	{
-		ft_putstr_fd("minishell: command not found\n", 2);
+		ft_putstr_fd(cmd->args[0], 2);
+		ft_putendl_fd(": command not found", 2);
 		exit(127);
 	}
-	execve(path, cmd->args, *envp);
-	ft_putendl_fd(strerror(errno), 2);
+	execve(path, cmd->args, shell->envp);
+	perror(cmd->args[0]);
 	exit(126);
 }
 
@@ -66,28 +83,36 @@ static int	wait_all(pid_t last)
 	return (1);
 }
 
-void	exec_pipeline(t_cmd *cmds, char ***envp)
+static void	parent_close(int *in, int p[2], t_cmd *cmds)
+{
+	if (*in != 0)
+		close(*in);
+	if (cmds->next)
+	{
+		close(p[1]);
+		*in = p[0];
+	}
+}
+
+void	exec_pipeline(t_cmd *cmds, t_shell *shell)
 {
 	int		p[2];
 	int		in;
 	pid_t	last;
-	t_cmd	*cur;
 
 	in = 0;
 	last = -1;
-	cur = cmds;
-	while (cur)
+	while (cmds)
 	{
-		if (cur->next && pipe(p) < 0)
+		if (cmds->next && pipe(p) < 0)
 			return ;
 		last = fork();
-		if (last == 0)
-			child_exec(cur, in, cur->next ? p[1] : 1, envp);
-		if (in != 0)
-			close(in);
-		if (cur->next)
-			close(p[1]), in = p[0];
-		cur = cur->next;
+		if (last == 0 && cmds->next)
+			child_exec(cmds, in, p[1], shell);
+		else if (last == 0)
+			child_exec(cmds, in, 1, shell);
+		parent_close(&in, p, cmds);
+		cmds = cmds->next;
 	}
 	g_exit_status = wait_all(last);
 	signal_prompt();
