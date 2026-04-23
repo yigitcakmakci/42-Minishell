@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexical_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:44:56 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/10 09:58:39 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/21 22:27:29 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 int	print_syntax_error(char *token_val)
 {
 	printf("syntax error near unexpected token '%s'\n", token_val);
+	g_exit_status = 2;
 	return (0);
 }
 
@@ -78,7 +79,8 @@ int	handle_quotes(char *str)
 				i++;
 			if (!str[i])
 			{
-				printf("-------QUOTES ERROR!-------\n");
+				printf("minishell: syntax error: unclosed quote\n");
+				g_exit_status = 2;
 				return (0);
 			}
 		}

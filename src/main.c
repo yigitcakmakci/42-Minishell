@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ycakmakc <ycakmakc@student.42kocaeli.co    +#+  +:+       +#+        */
+/*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 15:45:04 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/03/31 16:15:49 by ycakmakc         ###   ########.fr       */
+/*   Updated: 2026/04/23 21:15:09 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,65 +16,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int			g_exit_status = 0;
+int	g_exit_status = 0;
 
-static void	debug_prints(t_token *tokens, t_cmd *cmds)
-{
-	int	i;
-
-	while (tokens)
-	{
-		printf("-------TOKENS-----\nVERİ: _%s_\nTÜR: _%d_\nRIF: _%d_\n",
-			tokens->value, tokens->type, tokens->rif);
-		printf("+++++++TOKENS++++++\n");
-		tokens = tokens->next;
-	}
-	while (cmds)
-	{
-		i = 0;
-		printf("-------CMDS-----\nINFD: _%d_\nOUTFD: _%d_\n", cmds->infd,
-			cmds->outfd);
-		while (cmds->args && cmds->args[i])
-		{
-			printf("ARGS[%d] = _%s_\n", i, cmds->args[i]);
-			i++;
-		}
-		printf("+++++++CMDS++++++\n");
-		cmds = cmds->next;
-	}
-}
-
-static void	process_input(char *input, char **envp)
+static void	process_input(char *input, t_shell *shell)
 {
 	t_token	*tokens;
 	t_cmd	*cmds;
 
 	add_history(input);
-	tokens = lexical(input);
+	tokens = lexical(input, shell);
 	if (!tokens)
 		return ;
-	expander(tokens, envp);
-	cmds = parser(tokens, envp);
-	debug_prints(tokens, cmds);
+	expander(tokens, shell);
+	cmds = parser(tokens, shell);
+	if (!cmds)
+		return ;
+	exec(cmds, shell);
+	close_cmd_fds(cmds);
+}
+
+static void	init_shell(t_shell *shell, char **envp)
+{
+	shell->gc = NULL;
+	shell->input = NULL;
+	shell->envp = env_copy(envp, shell);
+	signal_prompt();
 }
 
 int	main(int argc, char **argv, char **envp)
 {
+	t_shell	shell;
 	char	*input;
 
 	(void)argc;
 	(void)argv;
+	init_shell(&shell, envp);
 	while (1)
 	{
-		input = readline("minishell$ ");
+		input = readline("minishell:");
+		shell.input = input;
 		if (!input)
 		{
 			printf("exit\n");
 			break ;
 		}
 		if (*input)
-			process_input(input, envp);
+			process_input(input, &shell);
 		free(input);
+		shell.input = NULL;
 	}
-	return (0);
+	gc_free_all(&shell.gc);
+	rl_clear_history();
+	return (g_exit_status);
 }
