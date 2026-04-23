@@ -6,7 +6,7 @@
 /*   By: burozdem <burozdem@student.42kocaeli.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 12:00:00 by ycakmakc          #+#    #+#             */
-/*   Updated: 2026/04/23 19:41:14 by burozdem         ###   ########.fr       */
+/*   Updated: 2026/04/23 23:38:43 by burozdem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,23 @@
 
 static char	*cd_target(t_cmd *cmd, t_shell *shell)
 {
+	char	*home;
+	char	*rest;
+
 	if (!cmd->args[1])
 		return (env_get(shell->envp, "HOME"));
+	if (ft_strncmp(cmd->args[1], "-", 2) == 0)
+		return (env_get(shell->envp, "OLDPWD"));
+	if (cmd->args[1][0] == '~')
+	{
+		home = env_get(shell->envp, "HOME");
+		if (!home)
+			return (cmd->args[1]);
+		rest = cmd->args[1] + 1;
+		if (*rest == '\0')
+			return (home);
+		return (gc_strjoin(home, rest, &shell->gc));
+	}
 	return (cmd->args[1]);
 }
 
